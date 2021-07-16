@@ -1,4 +1,5 @@
-﻿using FilmesAPIAlura.Models;
+﻿using FilmesAPIAlura.Data;
+using FilmesAPIAlura.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,26 +12,37 @@ namespace FilmesAPIAlura.Controllers
     [Route("[controller]")]
     public class FilmeController : ControllerBase
     {
-        private static List<Filme> filmes = new List<Filme>();
-        private static int id = 1;
+        private readonly FilmeContext context;
+
+        public FilmeController(FilmeContext context)
+        {
+            this.context = context;
+        }
 
         [HttpPost]
-        public void AdicionarFilme([FromBody] Filme filme)
+        public IActionResult AdicionarFilme([FromBody] Filme filme)
         {
-            filme.Id = id++;
-            filmes.Add(filme);
+            context.Filmes.Add(filme);
+            context.SaveChanges();
+
+            return CreatedAtAction(nameof(BuscarFilmePorId), new { filme.Id }, filme);
         }
 
         [HttpGet]
-        public IEnumerable<Filme> BuscarFilmes()
+        public IActionResult BuscarFilmes()
         {
-            return filmes;
+            return Ok(context.Filmes);
         }
 
         [HttpGet("{id}")]
-        public Filme BuscarFilmePorId(int id)
+        public IActionResult BuscarFilmePorId(int id)
         {
-            return filmes.FirstOrDefault(filme => filme.Id == id);
+            var filme = context.Filmes.FirstOrDefault(filme => filme.Id == id);
+
+            if (filme != null)
+                return Ok(filme);
+
+            return NotFound();
         }
     }
 }
