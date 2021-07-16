@@ -29,9 +29,9 @@ namespace FilmesAPIAlura.Controllers
         }
 
         [HttpGet]
-        public IActionResult BuscarFilmes()
+        public IEnumerable<Filme> BuscarFilmes()
         {
-            return Ok(context.Filmes);
+            return context.Filmes;
         }
 
         [HttpGet("{id}")]
@@ -43,6 +43,38 @@ namespace FilmesAPIAlura.Controllers
                 return Ok(filme);
 
             return NotFound();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult AtualizarFilme(int id, [FromBody] Filme filmeAtualizado)
+        {
+            var filme = context.Filmes.FirstOrDefault(filme => filme.Id == id);
+
+            if (filme == null)
+                return NotFound();
+
+            filme.Titulo = filmeAtualizado.Titulo;
+            filme.Diretor = filmeAtualizado.Diretor;
+            filme.Genero = filmeAtualizado.Genero;
+            filme.Duracao = filmeAtualizado.Duracao;
+
+            context.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult RemoverFilme(int id)
+        {
+            var filme = context.Filmes.FirstOrDefault(filme => filme.Id == id);
+
+            if (filme == null)
+                return NotFound();
+
+            context.Remove(filme);
+            context.SaveChanges();
+
+            return NoContent();
         }
     }
 }
