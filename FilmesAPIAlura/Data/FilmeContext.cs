@@ -17,8 +17,7 @@ namespace FilmesAPIAlura.Data
         public FilmeContext(DbContextOptions<FilmeContext> options)
             : base(options)
         {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
+
         }
 
         public DbSet<Filme> Filmes { get; set; }
